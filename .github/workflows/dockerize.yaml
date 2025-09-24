@@ -32,10 +32,13 @@ jobs:
 
       # Step 5: Build & Push Docker Images
       - name: Build & Push Docker Images
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          GITHUB_SHA: ${{ github.sha }}
         run: |
           SERVICES=("cart" "inventory" "users" "orders" "payments")
           for SERVICE in "${SERVICES[@]}"; do
-            IMAGE_TAG="${{ secrets.DOCKER_USERNAME,, }}/${SERVICE,,}:${GITHUB_SHA::7}"
+            IMAGE_TAG="$(echo $DOCKER_USERNAME | tr '[:upper:]' '[:lower:]')/$(echo $SERVICE | tr '[:upper:]' '[:lower:]'):${GITHUB_SHA:0:7}"
             echo "Building and pushing $SERVICE -> $IMAGE_TAG"
             docker build -t $IMAGE_TAG ./$SERVICE
             docker push $IMAGE_TAG
