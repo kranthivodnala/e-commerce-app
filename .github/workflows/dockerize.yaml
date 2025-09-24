@@ -3,25 +3,25 @@ name: Test Semgrep + Docker Build & Push
 on:
   push:
     branches:
-      - main
+      - main # Whenever changes are pushed to main branch
   workflow_dispatch:
 
 jobs:
   semgrep-docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
 
     steps:
       # Step 1: Checkout repo
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # Checkout the repository
 
       # Step 2: Install Semgrep
-      - name: Install Semgrep
-        run: pip install semgrep
+      - name: Install Semgrep # Install Semgrep
+        run: pip install semgrep # Install Semgrep using pip
 
       # Step 3: Run Semgrep scan (ignore Flask host warning)
       - name: Run Semgrep Scan
-        run: semgrep --config=p/ci --exclude-rule python.flask.security.audit.app-run-param-config.avoid_app_run_with_bad_host
+        run: semgrep --config=p/ci --exclude-rule python.flask.security.audit.app-run-param-config.avoid_app_run_with_bad_host # Run Semgrep with the specified configuration
 
       # Step 4: Docker login
       - name: Docker Login
@@ -38,7 +38,7 @@ jobs:
         run: |
           SERVICES=("cart" "inventory" "users" "orders" "payments")
           for SERVICE in "${SERVICES[@]}"; do
-            IMAGE_TAG="$(echo $DOCKER_USERNAME | tr '[:upper:]' '[:lower:]')/$(echo $SERVICE | tr '[:upper:]' '[:lower:]'):${GITHUB_SHA:0:7}"
+            IMAGE_TAG="$(echo $DOCKER_USERNAME | tr '[:upper:]' '[:lower:]')/$(echo $SERVICE | tr '[:upper:]' '[:lower:]'):${GITHUB_SHA:0:7}" # Create image tag using the first 7 characters of the commit SHA
             echo "Building and pushing $SERVICE -> $IMAGE_TAG"
             docker build -t $IMAGE_TAG ./$SERVICE
             docker push $IMAGE_TAG
