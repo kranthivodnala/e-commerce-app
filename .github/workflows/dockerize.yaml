@@ -32,7 +32,7 @@ jobs:
         with:
           config: "p/ci"   # you can use predefined rules or your custom rules
           severity-threshold: "ERROR"
-          exclude-rules: "python.flask.security.audit.app-run-param-config.avoid_app_run_with_bad_host"
+          args: "--exclude-rule python.flask.security.audit.app-run-param-config.avoid_app_run_with_bad_host"
 
       # ---------------------------
       # Step 2: Log in to Docker Hub
