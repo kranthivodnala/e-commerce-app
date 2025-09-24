@@ -19,21 +19,22 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Step 2: Run Semgrep scan (ignore Flask host warning)
-      - name: Run Semgrep Scan
-        uses: returntocorp/semgrep-action@v1
-        with:
-          config: "p/ci"
-          args: "--exclude-rule python.flask.security.audit.app-run-param-config.avoid_app_run_with_bad_host"
+      # Step 2: Install Semgrep
+      - name: Install Semgrep
+        run: pip install semgrep
 
-      # Step 3: Docker login
+      # Step 3: Run Semgrep scan (ignore Flask host warning)
+      - name: Run Semgrep Scan
+        run: semgrep --config=p/ci --exclude-rule python.flask.security.audit.app-run-param-config.avoid_app_run_with_bad_host
+
+      # Step 4: Docker login
       - name: Docker Login
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Step 4: Build & Push Docker Images
+      # Step 5: Build & Push Docker Images
       - name: Build & Push Docker Images
         run: |
           SERVICES=("cart" "inventory" "users" "orders" "payments")
