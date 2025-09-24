@@ -13,7 +13,6 @@ jobs:
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      SERVICES=("cart" "inventory" "users" "orders" "payments")
 
     steps:
       # Step 1: Checkout repo
@@ -37,9 +36,13 @@ jobs:
       # Step 4: Build & Push Docker Images
       - name: Build & Push Docker Images
         run: |
-          for SERVICE in ${SERVICES[@]}; do
+          SERVICES=("cart" "inventory" "users" "orders" "payments")
+          for SERVICE in "${SERVICES[@]}"; do
             IMAGE_TAG="${DOCKERHUB_USERNAME}/${SERVICE}:${GITHUB_SHA::7}"
             echo "Building and pushing $SERVICE -> $IMAGE_TAG"
             docker build -t $IMAGE_TAG ./$SERVICE
             docker push $IMAGE_TAG
           done
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
